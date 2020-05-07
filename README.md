@@ -1,4 +1,4 @@
-# CI/CD pipelining using Git, Github and Jenkins
+# CI/CD pipelining using Git, Github, Docker and Jenkins
 
 In this project i am going to integrate Git, Github, Docker and Jenkins to automate testing and deployment opeartion of software/application.
 
@@ -40,7 +40,7 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
 * Now for further changing in this repository let's create one developer branch for keeping the master branch stable by using the following command
       
       git branch branch_name
-      e.g.  git branch newdev 
+      e.g. git branch newdev 
       
 * Change to the created branch by using the following command
 
