@@ -1,4 +1,4 @@
-# CI/CD pipelining using Git, Github, Docker and Jenkins
+# Automating testing and deployment operation using Git, Github, Docker and Jenkins
 
 In this project i am going to integrate Git, Github, Docker and Jenkins to automate testing and deployment opeartion of software/application.
 
@@ -37,14 +37,18 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
        
        git push
 
-* Now for further changing in this repository let's create one developer branch for keeping the master branch stable by using the following command
+* Now for making changes in the files in this repository let's create one developer branch in order to keep the master branch stable by using the following command
       
       git branch branch_name
       e.g. git branch newdev 
       
-* Change to the created branch by using the following command
+* To change the other created branch use the following command
 
       git checkout branch_name (in my case it is  newdev)
       
       
   Now we have created a github repository and pushed the files successfully.
+  
+### 2. Let's create jobs in Jenkins for automation
+
+#### 2a. First job
