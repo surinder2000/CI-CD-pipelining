@@ -42,13 +42,40 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
       git branch branch_name
       e.g. git branch newdev 
       
-* To change the other created branch use the following command
+* To switch to the other created branch use the following command
 
       git checkout branch_name (in my case it is  newdev)
       
-      
-  Now we have created a github repository and pushed the files successfully.
   
-### 2. Let's create jobs in Jenkins for automation
+### 2. Let's create Jenkins jobs for automation
+* Login to jenkins
 
-#### 2a. First job
+#### 2a. First job for testing
+* Click on New item in the jenkins dashboard a new window will open
+* Enter the job name in the box below _Enter an item name_ (lets say Test job)
+* Click on Freestyle project and then press OK then a new window will open for configuring the job
+* In Source Control Management section check Git
+* Enter the Repository URL and specify the name of the developer branch in Branch Specifier box (in my case it is newdev)
+* In the Build Triggers section select Poll SCM, put * * * * * in Schedule box for checking the github in every minute
+* In the Build Environment section click on Add build step, from the dropdown menu select Execute shell and then put the following code in the Command box
+          
+          sudo cp * /root/myweb/
+
+          if sudo docker ps -a | grep testos 
+          then
+            sudo docker rm -f testos
+          fi
+
+          sudo docker run --rm -dit -v /root/myweb:/usr/local/apache2/htdocs/  --name testos httpd
+          
+  It will copy the webpages into the myweb folder which is already created in the server system (in my case it is RHEL 8). I am using docker for testing and deployment of the site. Here if condition will check whether in the docker testos container is already running or not, if it is already running then it will remove it. A new docker container is launched for testing the website before deploy it which contains the same environment that is used in deployment container for deploying the webisite.
+  
+* Click on Apply and Save button with this Test job will be created successfully
+
+#### 2b. Second job for Deployment
+
+
+#### 3b. Third job for triggering the Deploy job by the QAT (Quality Assurance Team)
+
+
+
