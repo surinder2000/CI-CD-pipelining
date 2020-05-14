@@ -56,7 +56,13 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
 * Click on Freestyle project and then press OK then a new window will open for configuring the job
 * In Source Control Management section check Git
 * Enter the Repository URL and specify the name of the developer branch in Branch Specifier box (in my case it is newdev)
+
+![Git configure](https://github.com/surinder2000/automating_testing_and_deployment_operation/blob/master/test1.jpg)
+
 * In the Build Triggers section select Poll SCM (you can choose any trigger of your own choice i am using Poll SCM), put * * * * * in Schedule box for checking the github in every minute
+
+![Build Trigger configure](https://github.com/surinder2000/automating_testing_and_deployment_operation/blob/master/test2.jpg)
+
 * In the Build Environment section click on Add build step, from the dropdown menu select Execute shell and then put the following code in the Command box
           
           sudo cp * /root/myweb/
@@ -70,6 +76,8 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
           
   It will copy the webpages into the myweb directory which is already created in the server system (in my case it is RHEL 8). I am using docker for testing and deployment of the site. Here if condition will check whether in the docker testos container is already running or not, if it is already running then it will remove it. A new docker container is launched for testing the website before deploy it which contains the same environment that is used in deployment container for deploying the webisite.
   
+![Build Environment configure](https://github.com/surinder2000/automating_testing_and_deployment_operation/blob/master/test3.jpg)
+  
 * Click on Apply and Save button with this Test job will be created successfully
 
 #### 2b. Second job for Deployment
@@ -78,7 +86,13 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
 * Click on Freestyle project and then press OK then a new window will open for configuring the job
 * In Source Control Management section check Git
 * Enter the Repository URL and specify the name of the branch as **master** in Branch Specifier box
+
+![Git configure](https://github.com/surinder2000/automating_testing_and_deployment_operation/blob/master/deploy1.jpg)
+
 * In the Build Triggers section select Poll SCM (you can choose any trigger of your own choice i am using Poll SCM), put * * * * * in Schedule box for checking the github in every minute
+
+![Build Trigger configure](https://github.com/surinder2000/automating_testing_and_deployment_operation/blob/master/deploy2.jpg)
+
 * In the Build Environment section click on Add build step, from the dropdown menu select Execute shell and then put the following code in the Command box
 
       sudo cp * /root/webdeploy/
@@ -92,24 +106,33 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
       
   It will copy the webpages into the webdeploy directory which is already created in the server system (in my case it is RHEL 8). As I already told you that I am using docker for testing and deployment of the site. Here if condition will check whether in the docker deployos container is already running or not, if it is already running then it is ok but if it is not running then it will launch deployos container and expose it to 8090 port.
   
+![Build Environment configure](https://github.com/surinder2000/automating_testing_and_deployment_operation/blob/master/deploy3.jpg)
   
-* Click on Apply and Save button with this Test job will be created successfully
+* Click on Apply and Save button with this Deploy job will be created successfully
 
 #### 3b. Third job for triggering the Deploy job by the QAT (Quality Assurance Team)
 * Again the first three steps same click on New item in the jenkins dashboard a new window will open
 * Enter the job name in the box below _Enter an item name_ (lets say QAT job)
 * Click on Freestyle project and then press OK then a new window will open for configuring the job
 * In Source Control Management section check Git
-* Enter the Repository URL and specify the name of the developer branch in Branch Specifier box (in my case it is newdev), in this job we need to provide credentials because we have to merge the developer branch into master, to provide the credentials.
-* To provide credentials click on Add, then click on jenkins a new page will show, in that page just put your user name and password of github and leave the other boxes as it is ans click on Add. After this click on down arrow of credentials box and select your username and password
+* Enter the Repository URL and specify the name of the developer branch in Branch Specifier box (in my case it is newdev)
+* In this job we need to provide credentials because we have to merge the developer branch into master
+* To provide credentials click on Add, then click on jenkins a new page will show, in that page just put your user name and password of github and leave the other boxes as it is and click on Add. After this click on down arrow of credentials box and select your username and password
 * In this section below click on Add button of Additional Behaviours, a drop down menu will pop up, from the menu click on **merge before build**, put the Name of repository as **origin** (if you have other name put that one), Branch to merge to as **master**, leave the other boxes as it is
+
+![Git configure](https://github.com/surinder2000/automating_testing_and_deployment_operation/blob/master/qat1.jpg)
+
 * In the Build Triggers section select Trigger builds remotely (you can choose any trigger of your own choice), put Authentication Token in the box, then the following url is used for triggering the job
  
       JENKINS_URL/job/QAT%20Job/build?token=TOKEN_NAME
       
   Just replace JENKINS_URL with the url of the jenkins and TOKEN_NAME with the token which is set in Authentication Token box
+  
+![Build Trigger configure](https://github.com/surinder2000/automating_testing_and_deployment_operation/blob/master/qat2.jpg)
 
 * At last go to Post-build Actions section, click on Add post-build action, from the drop down menu select Git Publisher, check Push Only If Build Succeeds and Merge Results, click on Add Branch, put Branch to push as **master**, Target remote name as **origin** (you can put whatever in your case) that's it click on apply and save button and we are done.
+
+![Post-build Actions configure](https://github.com/surinder2000/automating_testing_and_deployment_operation/blob/master/qat3.jpg)
 
 ### 3. Let's create one hook for pushing the file into github on commiting
 * Go to hooks directory from your git repository by using the follwing command
