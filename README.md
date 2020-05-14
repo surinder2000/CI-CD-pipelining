@@ -56,7 +56,7 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
 * Click on Freestyle project and then press OK then a new window will open for configuring the job
 * In Source Control Management section check Git
 * Enter the Repository URL and specify the name of the developer branch in Branch Specifier box (in my case it is newdev)
-* In the Build Triggers section select Poll SCM, put * * * * * in Schedule box for checking the github in every minute
+* In the Build Triggers section select Poll SCM (you can choose any trigger of your own choice i am using Poll SCM), put * * * * * in Schedule box for checking the github in every minute
 * In the Build Environment section click on Add build step, from the dropdown menu select Execute shell and then put the following code in the Command box
           
           sudo cp * /root/myweb/
@@ -68,14 +68,67 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
 
           sudo docker run --rm -dit -v /root/myweb:/usr/local/apache2/htdocs/  --name testos httpd
           
-  It will copy the webpages into the myweb folder which is already created in the server system (in my case it is RHEL 8). I am using docker for testing and deployment of the site. Here if condition will check whether in the docker testos container is already running or not, if it is already running then it will remove it. A new docker container is launched for testing the website before deploy it which contains the same environment that is used in deployment container for deploying the webisite.
+  It will copy the webpages into the myweb directory which is already created in the server system (in my case it is RHEL 8). I am using docker for testing and deployment of the site. Here if condition will check whether in the docker testos container is already running or not, if it is already running then it will remove it. A new docker container is launched for testing the website before deploy it which contains the same environment that is used in deployment container for deploying the webisite.
   
 * Click on Apply and Save button with this Test job will be created successfully
 
 #### 2b. Second job for Deployment
+* Again click on New item in the jenkins dashboard a new window will open
+* Enter the job name in the box below _Enter an item name_ (lets say Deploy job)
+* Click on Freestyle project and then press OK then a new window will open for configuring the job
+* In Source Control Management section check Git
+* Enter the Repository URL and specify the name of the branch as **master** in Branch Specifier box
+* In the Build Triggers section select Poll SCM (you can choose any trigger of your own choice i am using Poll SCM), put * * * * * in Schedule box for checking the github in every minute
+* In the Build Environment section click on Add build step, from the dropdown menu select Execute shell and then put the following code in the Command box
 
+      sudo cp * /root/webdeploy/
+
+      if sudo docker ps | grep deployos
+      then
+        echo "Already running" 
+      else
+        sudo docker run --rm -dit -v /root/webdeploy:/usr/local/apache2/htdocs/ -p 8090:80  --name deployos httpd
+      fi
+      
+  It will copy the webpages into the webdeploy directory which is already created in the server system (in my case it is RHEL 8). As I already told you that I am using docker for testing and deployment of the site. Here if condition will check whether in the docker deployos container is already running or not, if it is already running then it is ok but if it is not running then it will launch deployos container and expose it to 8090 port.
+  
+  
+* Click on Apply and Save button with this Test job will be created successfully
 
 #### 3b. Third job for triggering the Deploy job by the QAT (Quality Assurance Team)
+* Again the first three steps same click on New item in the jenkins dashboard a new window will open
+* Enter the job name in the box below _Enter an item name_ (lets say QAT job)
+* Click on Freestyle project and then press OK then a new window will open for configuring the job
+* In Source Control Management section check Git
+* Enter the Repository URL and specify the name of the developer branch in Branch Specifier box (in my case it is newdev), in this job we need to provide credentials because we have to merge the developer branch into master, to provide the credentials.
+* To provide credentials click on Add, then click on jenkins a new page will show, in that page just put your user name and password of github and leave the other boxes as it is ans click on Add. After this click on down arrow of credentials box and select your username and password
+* In this section below click on Add button of Additional Behaviours, a drop down menu will pop up, from the menu click on **merge before build**, put the Name of repository as **origin** (if you have other name put that one), Branch to merge to as **master**, leave the other boxes as it is
+* In the Build Triggers section select Trigger builds remotely (you can choose any trigger of your own choice), put Authentication Token in the box, then the following url is used for triggering the job
+ 
+      JENKINS_URL/job/QAT%20Job/build?token=TOKEN_NAME
+      
+  Just replace JENKINS_URL with the url of the jenkins and TOKEN_NAME with the token which is set in Authentication Token box
 
+* At last go to Post-build Actions section, click on Add post-build action, from the drop down menu select Git Publisher, check Push Only If Build Succeeds and Merge Results, click on Add Branch, put Branch to push as **master**, Target remote name as **origin** (you can put whatever in your case) that's it click on apply and save button and we are done.
 
+### 3. Let's create one hook for pushing the file into github on commiting
+* Go to hooks directory from your git repository by using the follwing command
 
+      cd .git/hooks
+      
+* Create one file name post-commit (it is a fixed name) using notepad and put the following code inside the file and save it without any extension
+
+      #!/bin/bash
+      git push
+
+   This script will push the files to github as soon as we commit the files in git, we don't need to write `git push` command separately
+ 
+ 
+### 4. Let's test the automation
+* First go to developer branch from git repository using following command 
+
+      git checkout branch_name (in my case it is newdev)
+      
+* Make some changes in one of the webpage
+* Commit it that's it
+* Now the file will automatically be pushed into github newdev branch due to this first job will be triggered and the code will deploy on testing environment, after this QAT team will check the website and if it is ok then QAT team will trigger the third job by using the url that we have created for triggering the third job which will merge the developer branch code into master branch, and as soon as the code is merged second job will be triggered and it deploy the code on deployment environment. If website will not work properly QAT team will connect to developer in some way and ask for making corrections in the code. 
