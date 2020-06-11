@@ -110,7 +110,7 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
   
 * Click on Apply and Save button with this Deploy job will be created successfully
 
-#### 3b. Third job for triggering the Deploy job by the QAT (Quality Assurance Team)
+#### 2c. Third job for triggering the Deploy job by the QAT (Quality Assurance Team)
 * Again the first three steps same click on New item in the jenkins dashboard a new window will open
 * Enter the job name in the box below _Enter an item name_ (lets say QAT job)
 * Click on Freestyle project and then press OK then a new window will open for configuring the job
@@ -135,7 +135,7 @@ In this project i am going to integrate Git, Github, Docker and Jenkins to autom
 ![Post-build Actions configure](https://github.com/surinder2000/automating_testing_and_deployment_operation/blob/master/qat3.jpg)
 
 ### 3. Let's create one hook for pushing the file into github on commiting
-* Go to hooks directory from your git repository by using the follwing command
+* Go to hooks directory from your git repository by using the following command
 
       cd .git/hooks
       
